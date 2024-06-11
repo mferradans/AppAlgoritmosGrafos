@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Algoritmos de Grafos</title>
+    <!-- Enlaces a Bootstrap y Vis.js -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript">
+        // Manejar cambio de algoritmo
+        function handleAlgorithmChange() {
+            const algorithm = document.getElementById('algorithm').value;
+            const startNodeInput = document.getElementById('startNode');
+            const endNodeInput = document.getElementById('endNode');
+            const requiresEndNode = algorithm === 'Dijkstra' || algorithm === 'Ford-Fulkerson';
+            startNodeInput.disabled = false;
+            endNodeInput.disabled = !requiresEndNode;
+            if (!requiresEndNode) {
+                endNodeInput.value = '';
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", handleAlgorithmChange);
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Delete" || event.key === "Backspace") {
+                deleteSelectedNode();
+            }
+        });
+
+        // Dibujar el grafo
+        function drawGraph(data) {
+            const nodes = new vis.DataSet(data.nodes);
+            const edges = new vis.DataSet(data.edges);
+            const container = document.getElementById('network');
+            const network = new vis.Network(container, { nodes, edges }, {
+                physics: false,
+                edges: {
+                    color: { color: '#000', highlight: '#00f', hover: '#f00' },
+                    smooth: { enable: true, forceDirection: 'horizontal', type: 'continuous' },
+                    arrows: { to: { enabled: true } }
+                }
+              });
+
+            // Manejar doble clic en arista
+            network.on("doubleClick", function (params) {
+                if (params.edges.length > 0) {
+                    const edge = edges.get(params.edges[0]);
+                    const newWeight = prompt("Ingresa el nuevo peso:", edge.label);
+                    if (newWeight !== null) {
+                        edge.label = newWeight;
+                        edge.weight = parseInt(newWeight);
+                        edges.update(edge);
+                        updateEdgeWeight(edge);
+                    }
+                }
+            });
+
+            // Manejar selección de nodo
+            network.on("selectNode", function (params) {
+                const selectedNodeId = params.nodes[0];
+                deleteSelectedNode = function() {
+                    nodes.remove({id: selectedNodeId});
+                    fetch(`/remove-node?node=${selectedNodeId}`, { method: 'POST' });
+                };
+            });
+        }
+
+        // Actualizar peso de arista en el servidor
+        function updateEdgeWeight(edge) {
+            fetch('/update-edge-weight', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ start: edge.from, end: edge.to, weight: edge.weight })
+            });
+        }
+
+        // Obtener datos del grafo y dibujarlo
+        function fetchDataAndDrawGraph() {
+            fetch('/graph-data')
+                .then(response => response.json())
+                .then(data => drawGraph(data));
+        }
+
+        let deleteSelectedNode = function() {};
+
+        // Inicializar grafo al cargar la página
+        fetchDataAndDrawGraph();
+    </script>
+
+    <style>
+        body { padding: 20px; }
+        .vis-network { border: 1px solid #ddd; margin-top: 20px; }
+        .form-group label { font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center">Algoritmos de Grafos</h1>
+
+    <!-- Formulario para agregar arista -->
+    <form action="/add-edge" method="post" class="mt-4">
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="start">Nodo Inicial:</label>
+                <input type="text" id="start" name="start" class="form-control" required>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="end">Nodo Final:</label>
+                <input type="text" id="end" name="end" class="form-control" required>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="weight">Peso:</label>
+                <input type="number" id="weight" name="weight" class="form-control" required>
+            </div>
+            <div class="form-group col-md-3 align-self-end">
+                <button type="submit" class="btn btn-primary btn-block">Agregar Arista</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Formulario para eliminar nodo -->
+    <form action="/remove-node" method="post" class="mt-3">
+        <div class="form-row">
+            <div class="form-group col-md-9">
+                <label for="node">Nodo a Eliminar:</label>
+                <input type="text" id="node" name="node" class="form-control" required>
+            </div>
+            <div class="form-group col-md-3 align-self-end">
+                <button type="submit" class="btn btn-danger btn-block">Eliminar Nodo</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Botón para reiniciar el grafo -->
+    <form action="/reset-graph" method="post" class="mt-3">
+        <button type="submit" class="btn btn-warning btn-block">Reiniciar Grafo</button>
+    </form>
+
+    <!-- Formulario para ejecutar algoritmo -->
+    <form action="/run-algorithm" method="get" class="mt-4">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="algorithm">Seleccionar Algoritmo:</label>
+                <select id="algorithm" name="algorithm" class="form-control" onchange="handleAlgorithmChange()">
+                    <option value="Prim">Algoritmo de Prim</option>
+                    <option value="Dijkstra">Algoritmo de Dijkstra</option>
+                    <option value="Ford-Fulkerson">Algoritmo de Ford-Fulkerson</option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="startNode">Nodo Inicial:</label>
+                <input type="text" id="startNode" name="start" class="form-control">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="endNode">Nodo Final:</label>
+                <input type="text" id="endNode" name="end" class="form-control">
+            </div>
+            <div class="form-group col-md-12">
+                <button type="submit" class="btn btn-success btn-block">Ejecutar Algoritmo</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Mensaje informativo -->
+    <div th:if="${message}" class="alert alert-info mt-3">
+        <p th:text="${message}"></p>
+    </div>
+
+    <!-- Contenedor para el grafo -->
+    <div id="network" style="width: 100%; height: 600px;"></div>
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

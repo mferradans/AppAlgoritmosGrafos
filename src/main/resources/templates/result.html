@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Resultado del Algoritmo</title>
+    <!-- Enlaces a Bootstrap y Vis.js -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+    <style>
+        .vis-network { border: 1px solid #ddd; margin-top: 20px; }
+        .result-container { margin-top: 20px; }
+        .card { margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center">Resultado del Algoritmo</h1>
+    <!-- Contenedor para el grafo -->
+    <div id="result-network" style="width: 100%; height: 600px;"></div>
+    <div id="algorithm-details" class="result-container">
+        <div class="card">
+            <div class="card-header">
+                <h3>Detalles del Algoritmo</h3>
+            </div>
+            <div class="card-body">
+                <!-- Los detalles del algoritmo se insertarán aquí -->
+            </div>
+        </div>
+    </div>
+    <!-- Botón para volver -->
+    <a href="/" class="btn btn-secondary mt-3">Volver</a>
+</div>
+
+<script type="text/javascript">
+    // Función para dibujar el grafo
+    function drawGraph(data) {
+        const nodes = new vis.DataSet(data.nodes);
+        const edges = new vis.DataSet(data.edges);
+        const container = document.getElementById('result-network');
+        const networkData = { nodes, edges };
+        const options = {
+            physics: false,  // Desactivar física
+            edges: {
+                color: { color: '#000', highlight: '#00f', hover: '#f00', opacity: 0.8 },
+                smooth: { enable: true, forceDirection: 'horizontal', type: 'continuous' },
+                arrows: { to: { enabled: true } }
+            }
+        };
+        const network = new vis.Network(container, networkData, options);
+
+        // Mostrar detalles del algoritmo
+        const algorithmDetails = document.querySelector('.card-body');
+
+        if (data.algorithm === 'Ford-Fulkerson') {
+            algorithmDetails.innerHTML = `<h5>Flujo Máximo desde ${data.start} a ${data.end}: ${data.maxFlow}</h5>`;
+            data.augmentingPaths.forEach(path => {
+                algorithmDetails.innerHTML += `<p>${path}</p>`;
+            });
+        } else if (data.totalWeight !== undefined) {
+            algorithmDetails.innerHTML = `<h5>Peso Total: ${data.totalWeight}</h5>`;
+            data.detailedEdges.forEach(edge => {
+                algorithmDetails.innerHTML += `
+                    <div class="card mb-2">
+                        <div class="card-body p-2">
+                            <p class="card-text">${edge.from} -> ${edge.to} = ${edge.weight}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        if (data.discardedEdges) {
+            data.discardedEdges.forEach(edge => {
+                edges.update({ id: edge.from + '-' + edge.to, color: { opacity: 0.2 } });
+            });
+        }
+    }
+
+    // Obtener parámetros de la URL y solicitar resultados del algoritmo
+    const urlParams = new URLSearchParams(window.location.search);
+    const algorithm = urlParams.get('algorithm');
+    const start = urlParams.get('start');
+    const end = urlParams.get('end');
+
+    fetch(`/algorithm-result?algorithm=${algorithm}&start=${start}&end=${end}`)
+        .then(response => response.json())
+        .then(data => {
+            data.algorithm = algorithm; // Agregar el algoritmo al resultado para mostrar detalles específicos
+            data.start = start; // Agregar el nodo de inicio para mostrar en los detalles
+            data.end = end; // Agregar el nodo de fin para mostrar en los detalles
+            drawGraph(data);
+        });
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
