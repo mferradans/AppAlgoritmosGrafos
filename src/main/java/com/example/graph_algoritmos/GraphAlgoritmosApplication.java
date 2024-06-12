@@ -1,18 +1,13 @@
 package com.example.graph_algoritmos;
 
-import com.example.graph_algoritmos.model.DijkstraAlgoritmo;
-import com.example.graph_algoritmos.model.FordFulkersonAlgoritmo;
-import com.example.graph_algoritmos.model.Graph;
-import com.example.graph_algoritmos.model.PrimAlgoritmo;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.List;
-import java.util.Map;
 
 @SpringBootApplication
 public class GraphAlgoritmosApplication {
-
 	public static void main(String[] args) {
+
+		/*
 		Graph graphA = new Graph(9);
 		graphA.addEdge("S", "2", 3);
 		graphA.addEdge("S", "3", 5);
@@ -155,10 +150,15 @@ public class GraphAlgoritmosApplication {
 		// Imprimir los resultados
 		System.out.println("Shortest path from A to F: " + String.join(" -> ", path));
 		System.out.println("Distance: " + distances.get("T"));
+		 */
 
-		/*
+
+
+
 		SpringApplication.run(GraphAlgoritmosApplication.class, args);
-	*/
 	}
+
+
+
 
 }

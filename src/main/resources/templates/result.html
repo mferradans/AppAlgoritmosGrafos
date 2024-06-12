@@ -48,7 +48,6 @@
             }
         };
         const network = new vis.Network(container, networkData, options);
-
         // Mostrar detalles del algoritmo
         const algorithmDetails = document.querySelector('.card-body');
 
@@ -56,6 +55,17 @@
             algorithmDetails.innerHTML = `<h5>Flujo Máximo desde ${data.start} a ${data.end}: ${data.maxFlow}</h5>`;
             data.augmentingPaths.forEach(path => {
                 algorithmDetails.innerHTML += `<p>${path}</p>`;
+            });
+        } else if (data.algorithm === 'Kruskal') {
+            algorithmDetails.innerHTML = `<h5>Peso Total del MST: ${data.totalWeight}</h5>`;
+            data.detailedEdges.forEach(edge => {
+                algorithmDetails.innerHTML += `
+                    <div class="card mb-2">
+                        <div class="card-body p-2">
+                            <p class="card-text">${edge.from} -> ${edge.to} = ${edge.weight}</p>
+                        </div>
+                    </div>
+                `;
             });
         } else if (data.totalWeight !== undefined) {
             algorithmDetails.innerHTML = `<h5>Peso Total: ${data.totalWeight}</h5>`;
@@ -94,6 +104,8 @@
 </script>
 </body>
 </html>
+
+
 
 
 

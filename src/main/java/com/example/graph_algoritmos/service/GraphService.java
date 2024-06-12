@@ -3,7 +3,7 @@ package com.example.graph_algoritmos.service;
 import com.example.graph_algoritmos.model.DijkstraAlgoritmo;
 import com.example.graph_algoritmos.model.FordFulkersonAlgoritmo;
 import com.example.graph_algoritmos.model.Graph;
-import com.example.graph_algoritmos.model.PrimAlgoritmo;
+import com.example.graph_algoritmos.model.KruskalAlgoritmo;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -20,7 +20,7 @@ public class GraphService {
     public void addEdge(String start, String end, int weight) {
         graph.addEdge(start, end, weight);
     }
-/*
+
     public void updateEdgeWeight(String start, String end, int weight) {
         graph.updateEdgeWeight(start, end, weight);
     }
@@ -28,7 +28,7 @@ public class GraphService {
     public void removeNode(String node) {
         graph.removeNode(node);
     }
-*/
+
     public void resetGraph() {
         this.graph = new Graph();
     }
@@ -37,8 +37,8 @@ public class GraphService {
         return graph;
     }
 
-    public Graph getPrimMST(String startNode) {
-        return PrimAlgoritmo.primMST(graph, startNode);
+    public Graph getKruskalMST() {
+        return KruskalAlgoritmo.kruskalMST(graph);
     }
 
     public Map<String, Object> getDijkstraShortestPaths(String start, String end) {
@@ -49,7 +49,6 @@ public class GraphService {
         return FordFulkersonAlgoritmo.fordFulkerson(graph, source, sink);
     }
 }
-
 
 
 

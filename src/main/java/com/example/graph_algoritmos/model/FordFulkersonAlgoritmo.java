@@ -2,29 +2,21 @@ package com.example.graph_algoritmos.model;
 
 import java.util.*;
 
-public class FordFulkersonAlgoritmo {
+public class FordFulkersonAlgoritmo{
     public static Map<String, Object> fordFulkerson(Graph graph, String source, String sink) {
         Map<String, Map<String, Integer>> residualGraph = new HashMap<>();
         Map<String, Map<String, Integer>> flow = new HashMap<>();
         List<String> augmentingPaths = new ArrayList<>();
 
-        // Inicializar el grafo residual y el flujo con nodos del grafo original
+        // Inicializar el grafo residual y el grafo de flujo
         for (String node : graph.getNodes()) {
             residualGraph.put(node, new HashMap<>());
             flow.put(node, new HashMap<>());
         }
-
-        // Inicializar las capacidades y flujos iniciales
         for (String node : graph.getNodes()) {
             for (Graph.Edge edge : graph.getEdges(node)) {
                 residualGraph.get(node).put(edge.end, edge.weight);
-                if (!residualGraph.containsKey(edge.end)) {
-                    residualGraph.put(edge.end, new HashMap<>());
-                }
-                if (!flow.containsKey(edge.end)) {
-                    flow.put(edge.end, new HashMap<>());
-                }
-                residualGraph.get(edge.end).putIfAbsent(node, 0); // Asegura que la arista inversa esté inicializada
+                residualGraph.get(edge.end).putIfAbsent(node, 0); // Si la arista inversa no existe, inicializar a 0
                 flow.get(node).put(edge.end, 0);
                 flow.get(edge.end).putIfAbsent(node, 0);
             }
@@ -56,6 +48,7 @@ public class FordFulkersonAlgoritmo {
                 flow.get(v).put(u, flow.get(v).get(u) - pathFlow);
             }
 
+            // Añadir la capacidad mínima al flujo máximo
             maxFlow += pathFlow;
             path.clear();
         }
@@ -89,7 +82,6 @@ public class FordFulkersonAlgoritmo {
         return false;
     }
 }
-
 
 
 

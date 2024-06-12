@@ -1,77 +1,85 @@
 package com.example.graph_algoritmos.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Graph {
-    private final Map<String, Integer> nodeIndex;
-    private final List<String> indexToNode;
-    private final int[][] adjacencyMatrix;
-    private int nodeCount;
+    private final Map<String, List<Edge>> adjacencyList;
 
-    public Graph(int maxNodes) {
-        nodeIndex = new HashMap<>();
-        indexToNode = new ArrayList<>();
-        adjacencyMatrix = new int[maxNodes][maxNodes];
-        nodeCount = 0;
-    }
-
-    public void addNode(String node) {
-        if (!nodeIndex.containsKey(node)) {
-            nodeIndex.put(node, nodeCount);
-            indexToNode.add(node);
-            nodeCount++;
-        }
+    public Graph() {
+        adjacencyList = new HashMap<>();
     }
 
     public void addEdge(String start, String end, int weight) {
-        addNode(start);
-        addNode(end);
-        int startIndex = nodeIndex.get(start);
-        int endIndex = nodeIndex.get(end);
-        adjacencyMatrix[startIndex][endIndex] = weight;
-        adjacencyMatrix[endIndex][startIndex] = weight; // Para grafo no dirigido
+        adjacencyList.computeIfAbsent(start, k -> new ArrayList<>()).add(new Edge(start, end, weight));
+        adjacencyList.computeIfAbsent(end, k -> new ArrayList<>());
     }
 
-    public int[][] getAdjacencyMatrix() {
-        return adjacencyMatrix;
-    }
-
-    public List<String> getNodes() {
-        return indexToNode;
-    }
-
-    public int getNodeCount() {
-        return nodeCount;
-    }
-
-    public String getNode(int index) {
-        return indexToNode.get(index);
-    }
-
-    public int getNodeIndex(String node) {
-        return nodeIndex.get(node);
-    }
-
-    public int getTotalWeight() {
-        int totalWeight = 0;
-        boolean[][] visited = new boolean[nodeCount][nodeCount];
-        for (int i = 0; i < nodeCount; i++) {
-            for (int j = 0; j < nodeCount; j++) {
-                if (adjacencyMatrix[i][j] != 0 && !visited[i][j]) {
-                    totalWeight += adjacencyMatrix[i][j];
-                    visited[i][j] = true;
-                    visited[j][i] = true; // Marcar la arista en ambas direcciones como visitada
+    public void updateEdgeWeight(String start, String end, int weight) {
+        List<Edge> edges = adjacencyList.get(start);
+        if (edges != null) {
+            for (Edge edge : edges) {
+                if (edge.end.equals(end)) {
+                    edge.weight = weight;
+                    break;
                 }
             }
         }
-        return totalWeight;
+    }
+
+    public void removeNode(String node) {
+        adjacencyList.values().forEach(edges -> edges.removeIf(edge -> edge.start.equals(node) || edge.end.equals(node)));
+        adjacencyList.remove(node);
+    }
+
+    public void removeEdge(String start, String end) {
+        List<Edge> startEdges = adjacencyList.get(start);
+        if (startEdges != null) {
+            startEdges.removeIf(edge -> edge.end.equals(end));
+        }
+    }
+
+    public List<Edge> getEdges(String node) {
+        return adjacencyList.get(node);
+    }
+
+    public Set<String> getNodes() {
+        return adjacencyList.keySet();
+    }
+
+    public List<Edge> getAllEdges() {
+        Set<Edge> allEdges = new HashSet<>();
+        for (List<Edge> edges : adjacencyList.values()) {
+            allEdges.addAll(edges);
+        }
+        return new ArrayList<>(allEdges);
+    }
+
+    public static class Edge {
+        public final String start;
+        public final String end;
+        public int weight;
+
+        public Edge(String start, String end, int weight) {
+            this.start = start;
+            this.end = end;
+            this.weight = weight;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Edge edge = (Edge) o;
+            return weight == edge.weight &&
+                    Objects.equals(start, edge.start) &&
+                    Objects.equals(end, edge.end);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(start, end, weight);
+        }
     }
 }
-
-
-
 
 

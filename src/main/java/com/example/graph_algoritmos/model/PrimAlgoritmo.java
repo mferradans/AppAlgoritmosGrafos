@@ -1,57 +1,29 @@
 package com.example.graph_algoritmos.model;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class PrimAlgoritmo {
+    // Implementa el algoritmo de Prim para encontrar el Árbol de Expansión Mínima (MST)
     public static Graph primMST(Graph graph, String startNode) {
-        int n = graph.getNodeCount();
-        int[][] adjMatrix = graph.getAdjacencyMatrix();
-        boolean[] inMST = new boolean[n];
-        int[] key = new int[n];
-        int[] parent = new int[n];
-        Arrays.fill(key, Integer.MAX_VALUE);
-        Arrays.fill(parent, -1);
+        Graph mst = new Graph(); // Grafo resultante para el MST
+        Set<String> visited = new HashSet<>(); // Conjunto de nodos visitados
+        PriorityQueue<Graph.Edge> edges = new PriorityQueue<>(Comparator.comparingInt(e -> e.weight)); // Cola de prioridad para aristas
 
-        int startIndex = graph.getNodeIndex(startNode);
-        key[startIndex] = 0;
+        // Comienza desde el nodo inicial
+        visited.add(startNode);
+        edges.addAll(graph.getEdges(startNode)); // Añadir aristas del nodo inicial a la cola de prioridad
 
-        for (int count = 0; count < n - 1; count++) {
-            int u = minKey(key, inMST, n);
-            inMST[u] = true;
-
-            for (int v = 0; v < n; v++) {
-                if (adjMatrix[u][v] != 0 && !inMST[v] && adjMatrix[u][v] < key[v]) {
-                    parent[v] = u;
-                    key[v] = adjMatrix[u][v];
-                }
+        // Procesar aristas en orden de peso ascendente
+        while (!edges.isEmpty() && visited.size() < graph.getNodes().size()) {
+            Graph.Edge edge = edges.poll(); // Extrae la arista con el menor peso
+            if (!visited.contains(edge.end)) {
+                visited.add(edge.end); // Marca el nodo final como visitado
+                mst.addEdge(edge.start, edge.end, edge.weight); // Añade la arista al MST
+                // Añade todas las aristas del nuevo nodo visitado que no llevan a nodos ya visitados
+                graph.getEdges(edge.end).stream().filter(nextEdge -> !visited.contains(nextEdge.end)).forEach(edges::add);
             }
         }
 
-        Graph mst = new Graph(n);
-        for (int i = 0; i < n; i++) {
-            if (parent[i] != -1) {
-                mst.addEdge(graph.getNode(parent[i]), graph.getNode(i), adjMatrix[i][parent[i]]);
-            }
-        }
-
-        return mst;
-    }
-
-    private static int minKey(int[] key, boolean[] inMST, int n) {
-        int min = Integer.MAX_VALUE, minIndex = -1;
-
-        for (int v = 0; v < n; v++) {
-            if (!inMST[v] && key[v] < min) {
-                min = key[v];
-                minIndex = v;
-            }
-        }
-
-        return minIndex;
+        return mst; // Devuelve el MST resultante
     }
 }
-
-
-
-
-

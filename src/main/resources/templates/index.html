@@ -14,14 +14,19 @@
             const algorithm = document.getElementById('algorithm').value;
             const startNodeInput = document.getElementById('startNode');
             const endNodeInput = document.getElementById('endNode');
+            const requiresStartNode = algorithm !== 'Kruskal';
             const requiresEndNode = algorithm === 'Dijkstra' || algorithm === 'Ford-Fulkerson';
-            startNodeInput.disabled = false;
+
+            startNodeInput.disabled = !requiresStartNode;
             endNodeInput.disabled = !requiresEndNode;
+
+            if (!requiresStartNode) {
+                startNodeInput.value = '';
+            }
             if (!requiresEndNode) {
                 endNodeInput.value = '';
             }
         }
-
         document.addEventListener("DOMContentLoaded", handleAlgorithmChange);
 
         document.addEventListener("keydown", function(event) {
@@ -145,7 +150,7 @@
             <div class="form-group col-md-4">
                 <label for="algorithm">Seleccionar Algoritmo:</label>
                 <select id="algorithm" name="algorithm" class="form-control" onchange="handleAlgorithmChange()">
-                    <option value="Prim">Algoritmo de Prim</option>
+                    <option value="Kruskal">Algoritmo de Kruskal</option>
                     <option value="Dijkstra">Algoritmo de Dijkstra</option>
                     <option value="Ford-Fulkerson">Algoritmo de Ford-Fulkerson</option>
                 </select>
@@ -174,9 +179,6 @@
 </div>
 </body>
 </html>
-
-
-
 
 
 

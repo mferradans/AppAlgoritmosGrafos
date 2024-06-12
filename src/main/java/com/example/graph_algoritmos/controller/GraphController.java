@@ -26,14 +26,14 @@ public class GraphController {
         model.addAttribute("message", "Arista añadida exitosamente");
         return "index";
     }
-/*
+
     @PostMapping("/remove-node")
     public String removeNode(@RequestParam String node, Model model) {
         graphService.removeNode(node);
         model.addAttribute("message", "Nodo removido exitosamente");
         return "index";
     }
-*/
+
     @PostMapping("/reset-graph")
     public String resetGraph(Model model) {
         graphService.resetGraph();
@@ -54,7 +54,7 @@ public class GraphController {
     public Map<String, Object> getGraphData() {
         return convertGraphToVisFormat(graphService.getGraph());
     }
-/*
+
     @PostMapping("/update-edge-weight")
     @ResponseBody
     public void updateEdgeWeight(@RequestBody Map<String, Object> payload) {
@@ -63,16 +63,13 @@ public class GraphController {
         int weight = (int) payload.get("weight");
         graphService.updateEdgeWeight(start, end, weight);
     }
-*/
+
     @GetMapping("/algorithm-result")
     @ResponseBody
     public Map<String, Object> getAlgorithmResult(@RequestParam String algorithm, @RequestParam(required = false) String start, @RequestParam(required = false) String end) {
         switch (algorithm) {
-            case "Prim":
-                if (start == null) {
-                    throw new IllegalArgumentException("Nodo inicial debe ser especificado para Prim");
-                }
-                return convertPrimResultToVisFormat(graphService.getPrimMST(start));
+            case "Kruskal":
+                return convertKruskalResultToVisFormat(graphService.getKruskalMST());
             case "Dijkstra":
                 if (start == null || end == null) {
                     throw new IllegalArgumentException("Nodos de inicio y de fin deben ser especificados para Dijkstra");
@@ -117,7 +114,7 @@ public class GraphController {
         return result;
     }
 
-    private Map<String, Object> convertPrimResultToVisFormat(Graph graph) {
+    private Map<String, Object> convertKruskalResultToVisFormat(Graph graph) {
         Map<String, Object> result = convertGraphToVisFormat(graph);
         result.put("totalWeight", graph.getAllEdges().stream().mapToInt(e -> e.weight).sum());
         result.put("detailedEdges", graph.getAllEdges().stream().map(edge -> Map.of(
