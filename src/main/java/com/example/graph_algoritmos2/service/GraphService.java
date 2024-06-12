@@ -1,9 +1,9 @@
-package com.example.graph_algoritmos.service;
+package com.example.graph_algoritmos2.service;
 
-import com.example.graph_algoritmos.model.DijkstraAlgoritmo;
-import com.example.graph_algoritmos.model.FordFulkersonAlgoritmo;
-import com.example.graph_algoritmos.model.Graph;
-import com.example.graph_algoritmos.model.KruskalAlgoritmo;
+import com.example.graph_algoritmos2.model.DijkstraAlgoritmo;
+import com.example.graph_algoritmos2.model.FordFulkersonAlgoritmo;
+import com.example.graph_algoritmos2.model.Graph;
+import com.example.graph_algoritmos2.model.KruskalAlgoritmo;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.example.graph_algoritmos.model;
+package com.example.graph_algoritmos2.model;
 
 import java.util.*;
 

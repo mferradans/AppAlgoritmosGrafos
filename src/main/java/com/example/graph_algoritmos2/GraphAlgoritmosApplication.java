@@ -1,4 +1,4 @@
-package com.example.graph_algoritmos;
+package com.example.graph_algoritmos2;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

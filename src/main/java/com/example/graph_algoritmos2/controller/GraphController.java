@@ -1,7 +1,7 @@
-package com.example.graph_algoritmos.controller;
+package com.example.graph_algoritmos2.controller;
 
-import com.example.graph_algoritmos.model.Graph;
-import com.example.graph_algoritmos.service.GraphService;
+import com.example.graph_algoritmos2.model.Graph;
+import com.example.graph_algoritmos2.service.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
